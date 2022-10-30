@@ -39,7 +39,3 @@ elif st.session_state["authentication_status"]:
     authenticator.logout('Logout', 'main')
     st.session_state['destinatario'] = 'joel'
     cf.switch_page('chat')
-
-    
-    
-print("ciao")       #prova uso git
