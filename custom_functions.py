@@ -40,3 +40,10 @@ def displayChat(u1, u2, ph):
     df = pd.read_csv("chat.csv", usecols=["Mittente", "Destinatario", "Messaggio"]).loc[((pd.read_csv("chat.csv")["Mittente"]==u1)&(pd.read_csv("chat.csv")["Destinatario"]==u2))|((pd.read_csv("chat.csv")["Mittente"]==u2)&(pd.read_csv("chat.csv")["Destinatario"]==u1))]
     with ph.container():
         st.table(df)
+        
+def getConv(file_csv):
+    import streamlit as st
+    import pandas as pd
+    import csv
+    df = pd.read_csv(file_csv)
+    return df
