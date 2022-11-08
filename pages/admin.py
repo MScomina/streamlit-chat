@@ -6,15 +6,33 @@ Created on Mon Nov  7 14:52:53 2022
 """
 import streamlit as st 
 import pandas as pd
+import yaml
+from pathlib import Path
 
 convos = pd.read_csv('chat.csv')
+file_path = Path(__file__).parent / '../config.yaml'
+with file_path.open('r') as file:
+    config = yaml.safe_load(file)
+utenti=config['credentials']['usernames']
 conversazioni, msgutenti, ban, admin = st.tabs(['Conversazioni','Messaggi utenti',' ban/unban', 'admin'])
 
 #Controlla la lista dei messaggi e controlla quali sono gli utenti
 with  conversazioni:
-    utente1 = st.selectbox("Utente1", options = convos.loc[:,"Mittente"])
-    utente2 = st.selectbox("Utente2", options = convos.loc[:,"Mittente"])
+    utente1 = st.selectbox("Utente1", options = utenti.keys())
+    utente2 = st.selectbox("Utente2", options = utenti.keys())
     if st.button('Mostra chat'): #Mostra i messaggi inviati tra i due utenti scelti, se ce ne sono
         tempData = convos[((convos['Mittente'] == utente1) | (convos['Mittente'] ==utente2)) & ((convos['Destinatario'] == utente1) | (convos['Destinatario'] ==utente2)) ]
         st.dataframe(tempData)   
+#Controlla messaggi singolo utente
+with msgutenti:
+            utente = st.selectbox("Utente", options = utenti.keys())
+            if st.button('Mostra messaggi'):
+                messaggi= convos[convos['Mittente']==utente]
+                st.dataframe(messaggi)
+                
+#Ban o Unban
+with ban:
+        utenteBan = st.selectbox("Seleziona un utente", options = utenti.keys())
+        if st.button('Banna l''utente '):
+            
         
