@@ -36,8 +36,13 @@ with ban:
         col1, col2 = st.columns([1,1], gap='medium')
         with col1:
             if st.button('Banna utente'):
-                st.write('Utente bannato')
+                st.write(utenteBan, 'bannato')
         with col2:
             if st.button('Sbanna utente'):
-                st.write('Utente sbannato')
-        
+                st.write(utenteBan, 'sbannato')
+
+#Creazione Admin
+with admin:
+    utenteAdmin = st.selectbox("Seleziona un utente da rendere admin", options = utenti.keys())
+    if st.button('Rendi utente un admin'):
+        st.write(utenteAdmin, 'è ora un admin')
