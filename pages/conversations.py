@@ -18,6 +18,10 @@ import numpy as np
 
 import custom_functions as cf
 
+st.set_page_config(page_title='How''s Goin', page_icon='💬', layout='wide', 
+                   initial_sidebar_state='collapsed')
+
+
 file_path = Path(__file__).parent / '../config.yaml'
 with file_path.open('r') as file:
     config = yaml.safe_load(file)
@@ -44,17 +48,20 @@ elif st.session_state["authentication_status"]:
     
     st.title(title)
 
+    #Expander per creare una nuova chat
     with st.expander("New Chat"):
         user = st.text_input('Enter an username', '')
         if st.button('Create'):
             st.session_state['destinatario'] = user
             cf.switch_page('chat')
 
+    #Load file csv
     file_csv = 'chat.csv'
     x=cf.getConv(file_csv)
     m=np.array(x)
     
     
+    #Visualizzazione utenti con cui si ha interagito
     contacts=[]
     
     for i in range(0,len(m)):
