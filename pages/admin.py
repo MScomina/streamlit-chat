@@ -17,6 +17,8 @@ utenti=config['credentials']['usernames']
 conversazioni, msgutenti, ban, admin = st.tabs(['Conversazioni','Messaggi utenti',' ban/unban', 'admin'])
 
 #Controlla la lista dei messaggi e controlla quali sono gli utenti
+#Praticamente controlla se in un messaggio ci sono come mittente o destinatario uno dei 2 utenti
+#Potrebbero esserci problemi nel caso possiamo far mandare messaggi a se stessi
 with  conversazioni:
     utente1 = st.selectbox("Utente1", options = utenti.keys())
     utente2 = st.selectbox("Utente2", options = utenti.keys())
