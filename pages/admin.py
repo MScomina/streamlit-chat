@@ -31,8 +31,13 @@ with msgutenti:
                 st.dataframe(messaggi)
                 
 #Ban o Unban
-#with ban:
-#       utenteBan = st.selectbox("Seleziona un utente", options = utenti.keys())#
-#      if st.button('Banna l''utente '):
-            
+with ban:
+        utenteBan = st.selectbox("Seleziona un utente", options = utenti.keys())
+        col1, col2 = st.columns([1,1], gap='medium')
+        with col1:
+            if st.button('Banna utente'):
+                st.write('Utente bannato')
+        with col2:
+            if st.button('Sbanna utente'):
+                st.write('Utente sbannato')
         
