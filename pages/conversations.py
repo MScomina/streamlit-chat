@@ -44,6 +44,12 @@ elif st.session_state["authentication_status"]:
     
     st.title(title)
 
+    with st.expander("New Chat"):
+        user = st.text_input('Enter an username', '')
+        if st.button('Create'):
+            st.session_state['destinatario'] = user
+            cf.switch_page('chat')
+
     file_csv = 'chat.csv'
     x=cf.getConv(file_csv)
     m=np.array(x)
