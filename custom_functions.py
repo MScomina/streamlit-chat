@@ -33,13 +33,17 @@ def switch_page(page_name: str):
 
     raise ValueError(f"Could not find page {page_name}. Must be one of {page_names}")
     
-def displayChat(u1, u2, ph):
+def displayChat(u1, u2):
     import streamlit as st
     import pandas as pd
-    ph.empty()
+    from streamlit_chat import message
     df = pd.read_csv("chat.csv", usecols=["Mittente", "Destinatario", "Messaggio"]).loc[((pd.read_csv("chat.csv")["Mittente"]==u1)&(pd.read_csv("chat.csv")["Destinatario"]==u2))|((pd.read_csv("chat.csv")["Mittente"]==u2)&(pd.read_csv("chat.csv")["Destinatario"]==u1))]
-    with ph.container():
-        st.table(df)
+    reversed_df = df.iloc[::-1]
+    for i,row in enumerate(reversed_df.itertuples()):
+        if row.Mittente == u1:
+            message(row.Messaggio, is_user=True, avatar_style="avataaars", key=str(i))
+        else:
+            message(row.Messaggio, avatar_style="micah", key=str(i))
         
 def getConv(file_csv):
     import streamlit as st
