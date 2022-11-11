@@ -30,16 +30,11 @@ elif st.session_state["authentication_status"]:
     mittente = st.session_state["username"]
     destinatario = st.session_state["destinatario"]
     
-    title = mittente.capitalize() + "'s and " + destinatario.capitalize() + "'s conversation"
+    if st.button("Back to conversations"):
+        cf.switch_page("conversations")
     
-    st.title(title)
+    st.title("Chat")
     
-    # Creazione chat
-    placeholder = st.empty()
-    cf.displayChat(mittente, destinatario, placeholder)
-    
-    
-    #Qui sotto la barra di invio messaggio e registrazione dei dati nel csv
     with st.form("Message", clear_on_submit = True):
         message = st.text_input("Insert a message:")
         submitted = st.form_submit_button("Send")
@@ -50,6 +45,5 @@ elif st.session_state["authentication_status"]:
                 with open("chat.csv","a", newline="") as csvfile:       # Scrittura csv
                     writer = csv.writer(csvfile)
                     writer.writerow([datetime.today().strftime('%Y-%m-%d %H:%M:%S'), mittente, destinatario, message])
-                cf.displayChat(mittente, destinatario, placeholder)        # Aggiorna i messaggi con il nuovo inviato
-    
-    # Volendo si può fare tutto dentro un while True in modo da poter continuamente verificare se l'altro utente ha inviato un messaggio
+                
+    cf.displayChat(mittente, destinatario) #Chat tra utenti
