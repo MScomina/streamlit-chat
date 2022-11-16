@@ -9,6 +9,7 @@ import pandas as pd
 import yaml
 from pathlib import Path
 
+
 convos = pd.read_csv('chat.csv')
 file_path = Path(__file__).parent / '../config.yaml'
 with file_path.open('r') as file:
@@ -39,12 +40,30 @@ with ban:
         with col1:
             if st.button('Banna utente'):
                 st.write(utenteBan, 'bannato')
+                config['credentials']['usernames'][utenteBan].update(banned=True)
+                with file_path.open('w') as file:
+                    yaml.dump(config, file, default_flow_style=False)
+                
         with col2:
             if st.button('Sbanna utente'):
                 st.write(utenteBan, 'sbannato')
+                config['credentials']['usernames'][utenteBan].update(banned=False)
+                with file_path.open('w') as file:
+                    yaml.dump(config, file, default_flow_style=False)
 
 #Creazione Admin
 with admin:
     utenteAdmin = st.selectbox("Seleziona un utente da rendere admin", options = utenti.keys())
-    if st.button('Rendi utente un admin'):
-        st.write(utenteAdmin, 'è ora un admin')
+    colA, colB = st.columns([1,1], gap='medium')
+    with colA:
+        if st.button('Rendi utente un admin'):
+            st.write(utenteAdmin, 'è ora un admin')
+            config['credentials']['usernames'][utenteAdmin].update(admin=True)
+            with file_path.open('w') as file:
+                yaml.dump(config, file, default_flow_style=False)
+    with colB:        
+        if st.button('Togli a utente privilegi admin'):
+            st.write(utenteAdmin, 'non è più un admin')
+            config['credentials']['usernames'][utenteAdmin].update(admin=False)
+            with file_path.open('w') as file:
+                yaml.dump(config, file, default_flow_style=False)
