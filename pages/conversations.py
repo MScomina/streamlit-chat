@@ -43,7 +43,9 @@ if st.session_state["authentication_status"] == False:
 elif st.session_state["authentication_status"] == None:
     st.warning('You are not logged in.')
     cf.switch_page('app')
-elif st.session_state["authentication_status"]:
+elif st.session_state["authentication_status"] and cf.isBanned(config, st.session_state["username"]): 
+    cf.switch_page('app')
+elif st.session_state["authentication_status"] and not cf.isBanned(config, st.session_state["username"]):  
     authenticator.logout('Logout', 'main')
     mittente = st.session_state["username"]
     
@@ -55,7 +57,7 @@ elif st.session_state["authentication_status"]:
     with st.expander("New Chat"):
         user = st.text_input('Enter an username', '')
         if st.button('Create'):
-            st.session_state['destinatario'] = user
+            st.session_state['destinatario'] = user.lower()
             cf.switch_page('chat')
 
     #Load file csv

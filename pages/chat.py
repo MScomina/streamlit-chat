@@ -30,10 +30,15 @@ if st.session_state["authentication_status"] == False:
 elif st.session_state["authentication_status"] == None:
     st.warning('You are not logged in.')
     cf.switch_page('app')
-elif st.session_state["authentication_status"]:     
+elif st.session_state["authentication_status"] and cf.isBanned(config, st.session_state["username"]): 
+    cf.switch_page('app')
+elif st.session_state["authentication_status"] and not cf.isBanned(config, st.session_state["username"]):  
     authenticator.logout('Logout', 'main')
     mittente = st.session_state["username"]
-    destinatario = st.session_state["destinatario"]
+    try:
+        destinatario = st.session_state["destinatario"]
+    except:
+        cf.switch_page('conversations')
     
     if st.button("Back to conversations"):
         cf.switch_page("conversations")
