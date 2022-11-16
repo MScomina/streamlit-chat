@@ -69,6 +69,12 @@ def initialize_database():
             "ADMIN" VARCHAR(50) REFERENCES utente(USERNAME),
             "REASON" VARCHAR(512) DEFAULT "Sei stato bannato da questo servizio." NOT NULL
             );''')
+        __conn.commit()
+        insert_user(["1234","1234","1234","$2b$12$NUNa.67YQdya.MIduX/cq.Exj8o59nsXQvVzsZ7X5N4aBOYT7lYla"])
+        insert_user(["ciao","ciao","ciao","$2b$12$QaZETOSP8fHxiO63cxAKTehWTiOvxCdm4r.N98VWBn4GOJuvi3d9i"])
+        insert_user(["luigi","Luigi","Luigi","$2b$12$0J/uklRLobAx37l4ZY3/K.QtK9uoFAGzEJgB.1AQpHCtgPDuQfBsa"])
+        insert_user(["joel","Joel","Joel","$2b$12$a.anduF9S1M0JsZ9k7USJOtZFd4oE5V/Z0Esmmo.5fowSl9V30v5W"])
+        insert_user(["asd","asd","asd","$2b$12$dHi5h/RHal0TnK1ZiHgXreerxh01B3m2vSBFl5ZiyJ4JmbLMqaZN2"],isAdmin=True)
     except Error as e:
         print(e)
             
