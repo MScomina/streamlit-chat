@@ -18,9 +18,12 @@ import numpy as np
 
 import custom_functions as cf
 
-st.set_page_config(page_title='How''s Goin', page_icon='💬', layout='wide', 
-                   initial_sidebar_state='collapsed')
+from PIL import Image
 
+
+im = Image.open("logo.png")
+st.set_page_config(page_title='How''s Goin', page_icon=im, layout='wide',
+                   initial_sidebar_state='collapsed')
 
 file_path = Path(__file__).parent / '../config.yaml'
 with file_path.open('r') as file:
