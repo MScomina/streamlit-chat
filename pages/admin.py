@@ -33,6 +33,8 @@ if st.session_state["authentication_status"] == False:
 elif st.session_state["authentication_status"] == None:
     st.warning('You are not logged in.')
     cf.switch_page('app')
+elif st.session_state["authentication_status"] and not cf.isAdmin(config, st.session_state["username"]):
+    st.warning('You do not have the authorization')
 elif st.session_state["authentication_status"] and cf.isAdmin(config, st.session_state["username"]):  
     authenticator.logout('Logout', 'main')
     
