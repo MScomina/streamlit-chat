@@ -17,10 +17,13 @@ import streamlit_authenticator as stauth
 
 import custom_functions as cf
 
+from PIL import Image
+
 #https://media.tenor.com/rrLadwcIvTIAAAAM/unicorn-magic.gif
 magicEnabled = True
 
-st.set_page_config(page_title='How''s Goin', page_icon='💬', layout='wide', 
+im = Image.open("logo.png")
+st.set_page_config(page_title='How''s Goin', page_icon=im, layout='wide', 
                    initial_sidebar_state='collapsed')
 
 
