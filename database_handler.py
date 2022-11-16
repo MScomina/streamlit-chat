@@ -33,7 +33,7 @@ def create_connection():
     close_connection()
     __conn = None
     try:
-        __conn = sqlite3.connect(r"database.db")
+        __conn = sqlite3.connect(r"database.db",check_same_thread=False)
     except Error as e:
         print(e)
         
@@ -48,14 +48,14 @@ def save_changes():
 #   Inizializza il database (se non esiste).
 def initialize_database():
     try:
-        __conn.execute('''CREATE TABLE IF NOT EXISTS utente (
+        __conn.execute('''CREATE TABLE IF NOT EXISTS utenti (
             "USERNAME" VARCHAR(50) PRIMARY KEY,
             "MAIL" VARCHAR(75) UNIQUE NOT NULL,
             "NAME" VARCHAR(50) NOT NULL,
             "PASSWORD" VARCHAR(255) NOT NULL,
             "ISADMIN" BOOLEAN NOT NULL
             );''')
-        __conn.execute('''CREATE TABLE IF NOT EXISTS messaggio (
+        __conn.execute('''CREATE TABLE IF NOT EXISTS messaggi (
             "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             "SENDER" VARCHAR(50) NOT NULL,
             "RECEIVER" VARCHAR(50) NOT NULL,
@@ -79,18 +79,18 @@ def initialize_database():
         print(e)
             
 
-#   Inserisce un utente/admin nel database.
+#   Inserisce un utente/admin nel database. Nel caso un utente con lo stesso nome esista già il comando verrà ignorato.
 #   Formato: [utente, mail, nome, password]
 def insert_user(data, isAdmin=False):
     try:
-        __conn.execute('''INSERT INTO utente (USERNAME, MAIL, NAME, PASSWORD, ISADMIN) VALUES (?,?,?,?,?);''', (*data,isAdmin))
+        __conn.execute('''INSERT INTO utenti (USERNAME, MAIL, NAME, PASSWORD, ISADMIN) VALUES (?,?,?,?,?) ON CONFLICT DO NOTHING;''', (*data,isAdmin))
         __conn.commit()
     except Error as e:
         print(e)
     
 #   Recupera i dati di un utente tramite lo username, None se non esiste.
 def retrieve_user(name):
-    cursor = __conn.execute('''SELECT username,mail,name,password,isAdmin FROM utente WHERE username=? LIMIT 1;''', (name,))
+    cursor = __conn.execute('''SELECT username,mail,name,password,isAdmin FROM utenti WHERE username=? LIMIT 1;''', (name,))
     data = None
     for row in cursor:
         data = row
@@ -101,7 +101,7 @@ def retrieve_user(name):
 #   ATTENZIONE, GLI UTENTI DEVONO ESISTERE NEL DATABASE!
 def save_message(data, timestamp=int(time())):
     try:
-        __conn.execute('''INSERT INTO messaggio (SENDER, RECEIVER, MESSAGE, TIMESTAMP) VALUES (?,?,?,?);''', (*data,timestamp))
+        __conn.execute('''INSERT INTO messaggi (SENDER, RECEIVER, MESSAGE, TIMESTAMP) VALUES (?,?,?,?);''', (*data,timestamp))
         __conn.commit()
     except Error as e:
         print(e)
@@ -110,7 +110,7 @@ def save_message(data, timestamp=int(time())):
 #   Recupera gli ultimi number (default 100) messaggi della chat dal database (sia ricevuta che inviata), ordinata in base al timestamp (dalla più recente alla più vecchia).
 #   Formato: [sender, receiver, message, timestamp]
 def retrieve_chat(name, number=100):
-    cursor = __conn.execute('''SELECT sender,receiver,message,timestamp FROM messaggio WHERE sender=? OR receiver=? ORDER BY TIMESTAMP DESC LIMIT ?;''',(name,name,number))
+    cursor = __conn.execute('''SELECT sender,receiver,message,timestamp FROM messaggi WHERE sender=? OR receiver=? ORDER BY TIMESTAMP DESC LIMIT ?;''',(name,name,number))
     data = []
     for row in cursor:
         data.append(row)
@@ -131,7 +131,36 @@ def ban_user(user, admin=None, message="Sei stato bannato da questo servizio."):
 def save_messages(data):
     try:
         c = __conn.cursor()
-        c.executemany('''INSERT INTO messaggio (SENDER, RECEIVER, MESSAGE) VALUES (?,?,?);''', data)
+        c.executemany('''INSERT INTO messaggi (SENDER, RECEIVER, MESSAGE) VALUES (?,?,?);''', data)
         __conn.commit()
     except Error as e:
         print(e)
+        
+        
+#   Elimina un utente all'interno del database.
+#   ATTENZIONE, QUESTA OPERAZIONE NON E' REVERSIBILE!
+def delete_user(name):
+    try:
+        __conn.execute('''DELETE FROM utenti WHERE USERNAME=? LIMIT 1;''', name)
+        __conn.commit()
+    except Error as e:
+        print(e)
+        
+        
+#   Rimuove un utente dalla lista ban.
+def unban_user(name):
+    try:
+        __conn.execute('''DELETE FROM ban WHERE USER=? LIMIT 1;''', name)
+        __conn.commit()
+    except Error as e:
+        print(e)
+        
+        
+#   Imposta il valore admin a un utente. Può rimuovere o aggiungere admin (valori 0 o 1).
+def set_admin(name, value):
+    try:
+        __conn.execute('''UPDATE utenti SET isAdmin=? WHERE USERNAME=? LIMIT 1;''', (value,name))
+        __conn.commit()
+    except Error as e:
+        print(e)
+        
