@@ -57,7 +57,7 @@ elif st.session_state["authentication_status"] and not cf.isBanned(config, st.se
     with st.expander("New Chat"):
         user = st.text_input('Enter an username', '')
         if st.button('Create'):
-            st.session_state['destinatario'] = user
+            st.session_state['destinatario'] = user.lower()
             cf.switch_page('chat')
 
     #Load file csv
