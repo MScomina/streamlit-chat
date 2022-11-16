@@ -16,6 +16,10 @@ credentials:
       email: baa@foo.bar
       name: Alex2 Bebeng
       password: $2b$12$hyyt4K8sxpegMAtXRQitKO6hDZmE1eSXA/sdCAoAdHn8bcgQ9RNGa
+    ciao:
+      email: ciao
+      name: ciao
+      password: $2b$12$QaZETOSP8fHxiO63cxAKTehWTiOvxCdm4r.N98VWBn4GOJuvi3d9i
     joel:
       email: Joel
       name: Joel
