@@ -10,8 +10,6 @@ Created on Tue Oct 25 15:42:17 2022
 
 import yaml
 from pathlib import Path
-
-import pandas as pd
 import streamlit as st
 import streamlit_authenticator as stauth
 
@@ -58,11 +56,19 @@ with register:
        st.error(e)
 
    
-#LUser Login Checks
+#User Login Checks
 if authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
     st.warning('Please enter your username and password')
-elif authentication_status:
+elif authentication_status and cf.isAdmin(config, st.session_state["username"]):
+    cf.switch_page('admin')
+elif authentication_status and cf.isBanned(config, st.session_state["username"]):
+    authenticator.logout('Logout', 'main')
+    st.warning('You were banned.')
+elif authentication_status and not cf.isBanned(config, st.session_state["username"]):
     cf.switch_page('conversations')
+
+    
+
 

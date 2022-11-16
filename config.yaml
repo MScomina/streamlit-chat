@@ -5,8 +5,8 @@ cookie:
 credentials:
   usernames:
     '1234':
-      admin: true
-      banned: false
+      admin: false
+      banned: true
       email: '1234'
       name: '1234'
       password: $2b$12$NUNa.67YQdya.MIduX/cq.Exj8o59nsXQvVzsZ7X5N4aBOYT7lYla

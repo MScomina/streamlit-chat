@@ -51,3 +51,10 @@ def getConv(file_csv):
     import csv
     df = pd.read_csv(file_csv)
     return df
+
+def isBanned(userData, username):
+    return userData['credentials']['usernames'][username].get('banned', False)
+        
+
+def isAdmin(userData, username):
+    return userData['credentials']['usernames'][username].get('admin', False)
