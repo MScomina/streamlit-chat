@@ -62,22 +62,27 @@ elif st.session_state["authentication_status"]:
     file_csv = 'chat.csv'
     x=cf.getConv(file_csv)
     m=np.array(x)
-    
+  #  st.write(m)
+    n=m[m[:, 1].argsort()]
+  #  st.write(m)
     
     #Visualizzazione utenti con cui si ha interagito
     contacts=[]
+    timestamp=[]
     
-    for i in range(0,len(m)):
+    for i in reversed(range(0,len(m))):
         if m[i][1]==mittente:
             if(m[i][2] not in contacts):
                 contacts.append(m[i][2])
+                timestamp.append(m[i][0])
         if m[i][2]==mittente:
             if(m[i][1] not in contacts):
                 contacts.append(m[i][1])
+                timestamp.append(m[i][0])
          
     
     for i in range(0,len(contacts)):
-        if st.button(contacts[i]):
+        if st.button(contacts[i]+' - '+timestamp[i]):
             st.session_state['destinatario'] = contacts[i]
             cf.switch_page('chat')
     
