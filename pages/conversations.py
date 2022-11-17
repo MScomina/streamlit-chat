@@ -65,7 +65,7 @@ elif st.session_state["authentication_status"] and not cf.isBanned(config, st.se
     x=cf.getConv(file_csv)
     m=np.array(x)
   #  st.write(m)
-    n=m[m[:, 1].argsort()]
+  #n=m[m[:, 1].argsort()]
   #  st.write(m)
     
     #Visualizzazione utenti con cui si ha interagito
