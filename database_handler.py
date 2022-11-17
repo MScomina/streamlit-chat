@@ -85,6 +85,7 @@ def insert_user(data, isAdmin=False):
     except Error as e:
         print(e)
     
+    
 #   Recupera i dati di un utente tramite lo username, None se non esiste.
 def retrieve_user(name):
     cursor = __conn.execute('''SELECT username,mail,name,password,isAdmin FROM utenti WHERE username=? LIMIT 1;''', (name,))
@@ -92,6 +93,7 @@ def retrieve_user(name):
     for row in cursor:
         data = row
     return data
+
 
 #   Salva un messaggio nel database. Data è un array di stringhe contenenti rispettivamente chi lo ha inviato, chi lo ha ricevuto e il messaggio.
 #   Formato: [sender, receiver, message]
@@ -112,6 +114,7 @@ def retrieve_chat(name, number=100):
     for row in cursor:
         data.append(row)
     return data
+
 
 #   Inserisce un utente all'interno della ban list nel database.
 def ban_user(user, admin=None, message="Sei stato bannato da questo servizio."):
@@ -161,7 +164,8 @@ def set_admin(name, value):
     except Error as e:
         print(e)
         
-# Restituisce 1 se il nome è quello di un admin, 0 altrimenti.
+        
+#   Restituisce 1 se il nome è quello di un admin, 0 altrimenti.
 def is_admin(name):
     out = __conn.execute('''SELECT isAdmin FROM utenti WHERE username=? LIMIT 1;''', name)
     data = None
@@ -170,7 +174,7 @@ def is_admin(name):
     return data
 
 
-# Restituisce il momento dell'ultima interazione fatta da un utente con tutti gli altri utenti.
+#   Restituisce il momento dell'ultima interazione fatta da un utente con tutti gli altri utenti.
 def get_last_interactions(name):
     out = __conn.execute('''SELECT receiver, max(timestamp) AS timestamp FROM (SELECT receiver,timestamp FROM (SELECT receiver,timestamp,row_number() OVER(PARTITION BY receiver ORDER BY timestamp DESC) AS rn FROM messaggi WHERE sender=?) t1 WHERE t1.rn=1
                             UNION
@@ -179,4 +183,23 @@ def get_last_interactions(name):
     data = []
     for row in out:
         data.append(row)
+    return data
+
+
+#   Modifica i dati di un utente all'interno del database.
+#   Formato data: [mail, nome, password]
+def edit_user(name, data):
+    try:
+        __conn.execute('''UPDATE utenti SET mail=?, name=?, password=? WHERE username=? LIMIT 1''', (*data, name))
+        __conn.commit()
+    except Error as e:
+        print(e)
+
+
+#   Controlla se un utente è bannato.
+def is_banned(name):
+    out = __conn.execute('''SELECT user FROM ban WHERE user=? LIMIT 1;''', name)
+    data = False
+    for row in out:
+        data = True
     return data
