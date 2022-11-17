@@ -11,7 +11,6 @@ Created on Tue Oct 25 15:42:17 2022
 import yaml
 from pathlib import Path
 
-import pandas as pd
 import streamlit as st
 import streamlit_authenticator as stauth
 import numpy as np
@@ -25,12 +24,16 @@ im = Image.open("logo.png")
 st.set_page_config(page_title='How''s Goin', page_icon=im, layout='wide',
                    initial_sidebar_state='collapsed')
 
+dh.create_connection()
+dh.initialize_database()
+dh.initialize_session_state()
+    
 file_path = Path(__file__).parent / '../config.yaml'
 with file_path.open('r') as file:
     config = yaml.safe_load(file)
 
 authenticator = stauth.Authenticate(
-    config['credentials'],
+    st.session_state["dbcredentials"],
     config['cookie']['name'],
     config['cookie']['key'],
     config['cookie']['expiry_days'],
@@ -43,9 +46,9 @@ if st.session_state["authentication_status"] == False:
 elif st.session_state["authentication_status"] == None:
     st.warning('You are not logged in.')
     cf.switch_page('app')
-elif st.session_state["authentication_status"] and cf.isBanned(config, st.session_state["username"]): 
+elif st.session_state["authentication_status"] and dh.is_banned(st.session_state["username"])[0]: 
     cf.switch_page('app')
-elif st.session_state["authentication_status"] and not cf.isBanned(config, st.session_state["username"]):  
+elif st.session_state["authentication_status"] and not dh.is_banned(st.session_state["username"])[0]:  
     authenticator.logout('Logout', 'main')
     mittente = st.session_state["username"]
     

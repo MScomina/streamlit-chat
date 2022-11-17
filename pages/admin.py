@@ -18,8 +18,12 @@ file_path = Path(__file__).parent / '../config.yaml'
 with file_path.open('r') as file:
     config = yaml.safe_load(file)
     
+db.create_connection()
+db.initialize_database()
+db.initialize_session_state()
+    
 authenticator = stauth.Authenticate(
-    config['credentials'],
+    st.session_state["dbcredentials"],
     config['cookie']['name'],
     config['cookie']['key'],
     config['cookie']['expiry_days'],
@@ -42,7 +46,7 @@ elif st.session_state["authentication_status"] and db.is_admin(st.session_state[
     file_path = Path(__file__).parent / '../config.yaml'
     with file_path.open('r') as file:
         config = yaml.safe_load(file)
-    utenti=config['credentials']['usernames']
+    utenti=st.session_state["dbcredentials"]['usernames']
     conversazioni, msgutenti, ban, admin = st.tabs(['Conversazioni','Messaggi utenti',' ban/unban', 'admin'])
     
     #Controlla la lista dei messaggi e controlla quali sono gli utenti

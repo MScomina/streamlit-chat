@@ -23,6 +23,8 @@ magicEnabled = True
 
 dh.create_connection()
 dh.initialize_database()
+dh.initialize_session_state()
+
 im = Image.open("logo.png")
 st.set_page_config(page_title='How''s Goin', page_icon=im, layout='wide', 
                    initial_sidebar_state='collapsed')
@@ -36,7 +38,7 @@ with file_path.open('r') as file:
     config = yaml.safe_load(file)
     
 authenticator = stauth.Authenticate(
-    config['credentials'],
+    st.session_state["dbcredentials"],
     config['cookie']['name'],
     config['cookie']['key'],
     config['cookie']['expiry_days'],
@@ -53,6 +55,7 @@ with register:
    try:
        if authenticator.register_user('Register user', preauthorization=False):
            st.success('User registered successfully')
+           
            with file_path.open('w') as file:
                yaml.dump(config, file, default_flow_style=False)
    except Exception as e:
@@ -64,12 +67,12 @@ if authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
     st.warning('Please enter your username and password')
-elif authentication_status and cf.isAdmin(config, st.session_state["username"]):
+elif authentication_status and dh.is_admin(st.session_state["username"]):
     cf.switch_page('admin')
-elif authentication_status and cf.isBanned(config, st.session_state["username"]):
+elif authentication_status and dh.is_banned(st.session_state["username"])[0]:
     authenticator.logout('Logout', 'main')
     st.warning('You were banned.')
-elif authentication_status and not cf.isBanned(config, st.session_state["username"]):
+elif authentication_status and not dh.is_banned(st.session_state["username"])[0]:
     cf.switch_page('conversations')
 
     

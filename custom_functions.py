@@ -55,3 +55,33 @@ def isBanned(userData, username):
 
 def isAdmin(userData, username):
     return userData['credentials']['usernames'][username].get('admin', False)
+
+
+#   Riceve un array di tuple in input e lo restituisce come dizionario secondo le labels.
+#   Utilizzato per ottenere un dizionario compatibile con Streamlit dell'elenco di utenti!
+def convert_to_dictionary(data: list, labels=["usernames","email","name","password","admin","banned"]) -> dict:
+    out = {}
+    temp = {}
+    for label in data:
+        k = "false"
+        if label[4]>=1:
+            k = "true"
+        info = {
+            labels[5] : str(label[5][0]).lower(),
+            labels[4] : k,
+            labels[1] : label[1],
+            labels[2] : label[2],
+            labels[3] : label[3]}
+        temp[label[0]] = info
+    out[labels[0]] = temp
+    return out
+
+
+def update_session_state(seconds=60):
+    from time import sleep
+    from database_handler import retrieve_all_users_and_ban_statuses
+    from streamlit import session_state
+    session_state["dbcredentials"] = convert_to_dictionary(retrieve_all_users_and_ban_statuses())
+    sleep(seconds)
+    update_session_state(seconds=seconds)
+    

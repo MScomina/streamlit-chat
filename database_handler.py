@@ -94,6 +94,17 @@ def retrieve_user(name):
         data = row
     return data
 
+#   Restituisce tutti gli utenti con le loro informazioni e il loro ban status.
+#   ATTENZIONE, COMPUTAZIONALMENTE PESANTE, DA USARE SOLO SE NECESSARIO!!!
+def retrieve_all_users_and_ban_statuses(limit=500):
+    cursor = __conn.execute('''SELECT username,mail,name,password,isAdmin FROM utenti LIMIT ?;''', (limit,))
+    data = []
+    for row in cursor:
+        data.append(row)
+    for idx, row in enumerate(data):
+        data[idx] = (*row,is_banned(row[0]))
+    return data
+
 
 #   Salva un messaggio nel database. Data è un array di stringhe contenenti rispettivamente chi lo ha inviato, chi lo ha ricevuto e il messaggio.
 #   Formato: [sender, receiver, message]
@@ -210,3 +221,11 @@ def is_banned(name):
     for row in out:
         data = (True, row[0])
     return data
+
+
+
+def initialize_session_state():
+    from streamlit import session_state
+    from custom_functions import convert_to_dictionary
+    if "dbcredentials" not in session_state:
+        session_state["dbcredentials"] = convert_to_dictionary(retrieve_all_users_and_ban_statuses())

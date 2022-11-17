@@ -6,7 +6,10 @@ import custom_functions as cf
 from PIL import Image
 import database_handler as dh
 
-
+dh.create_connection()
+dh.initialize_database()
+dh.initialize_session_state()
+    
 im = Image.open("logo.png")
 st.set_page_config(page_title='How''s Goin', page_icon=im, layout='wide',
                    initial_sidebar_state='collapsed')
@@ -16,7 +19,7 @@ with file_path.open('r') as file:
     config = yaml.safe_load(file)
 
 authenticator = stauth.Authenticate(
-    config['credentials'],
+    st.session_state["dbcredentials"],
     config['cookie']['name'],
     config['cookie']['key'],
     config['cookie']['expiry_days'],
@@ -29,9 +32,9 @@ if st.session_state["authentication_status"] == False:
 elif st.session_state["authentication_status"] == None:
     st.warning('You are not logged in.')
     cf.switch_page('app')
-elif st.session_state["authentication_status"] and cf.isBanned(config, st.session_state["username"]): 
+elif st.session_state["authentication_status"] and dh.is_banned(st.session_state["username"])[0]: 
     cf.switch_page('app')
-elif st.session_state["authentication_status"] and not cf.isBanned(config, st.session_state["username"]):  
+elif st.session_state["authentication_status"] and not dh.is_banned(st.session_state["username"])[0]:  
     authenticator.logout('Logout', 'main')
     mittente = st.session_state["username"]
     try:
