@@ -196,10 +196,10 @@ def edit_user(name, data):
         print(e)
 
 
-#   Controlla se un utente è bannato.
+#   Controlla se un utente è bannato e ritorna una ragione.
 def is_banned(name):
-    out = __conn.execute('''SELECT user FROM ban WHERE user=? LIMIT 1;''', name)
-    data = False
+    out = __conn.execute('''SELECT reason FROM ban WHERE user=? LIMIT 1;''', name)
+    data = (False, "")
     for row in out:
-        data = True
+        data = (True, row[0])
     return data
