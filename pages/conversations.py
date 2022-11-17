@@ -60,30 +60,14 @@ elif st.session_state["authentication_status"] and not cf.isBanned(config, st.se
             st.session_state['destinatario'] = user.lower()
             cf.switch_page('chat')
 
-    #Load file csv
-    #file_csv = 'chat.csv'
-    #x=cf.getConv(file_csv)
+    #Recupero dati dal DB
     x=dh.get_last_interactions(mittente)
-    st.write(x)
     m=np.array(x)
-    st.write(m)
-    #n=m[m[:, 1].argsort()]
-    #st.write(m)
     
     #Visualizzazione utenti con cui si ha interagito
     contacts=[]
     timestamp=[]
     
-    # for i in reversed(range(0,len(m))):
-    #     if m[i][1]==mittente:
-    #         if(m[i][2] not in contacts):
-    #             contacts.append(m[i][2])
-    #             timestamp.append(m[i][0])
-    #     if m[i][2]==mittente:
-    #         if(m[i][1] not in contacts):
-    #             contacts.append(m[i][1])
-    #             timestamp.append(m[i][0])
-         
     for i in range(0,len(m)):
         contacts.append(m[i][0])
         timestamp.append(m[i][1])
