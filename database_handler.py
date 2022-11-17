@@ -5,6 +5,7 @@ Created on Mon Nov 14 21:09:27 2022
 @author: Michele
 """
 
+from streamlit import session_state
 import sqlite3
 from sqlite3 import Error
 
@@ -57,7 +58,7 @@ def initialize_database():
             "SENDER" VARCHAR(50) NOT NULL,
             "RECEIVER" VARCHAR(50) NOT NULL,
             "MESSAGE" VARCHAR(4096) NOT NULL,
-            "TIMESTAMP" DATE NOT NULL DEFAULT (datetime('now','localtime')),
+            "TIMESTAMP" INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(SENDER) REFERENCES utente(USERNAME) ON DELETE CASCADE,
             FOREIGN KEY(RECEIVER) REFERENCES utente(USERNAME) ON DELETE CASCADE
             );''')
