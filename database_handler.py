@@ -108,8 +108,12 @@ def save_message(data):
     
 #   Recupera gli ultimi number (default 100) messaggi della chat dal database (sia ricevuta che inviata), ordinata in base al timestamp (dalla più recente alla più vecchia).
 #   Formato: [sender, receiver, message, timestamp]
-def retrieve_chat(name, number=100):
-    cursor = __conn.execute('''SELECT sender,receiver,message,timestamp FROM messaggi WHERE sender=? OR receiver=? ORDER BY TIMESTAMP DESC LIMIT ?;''',(name,name,number))
+def retrieve_chat(name, specific=None, number=100):
+    cursor = None
+    if specific==None:
+        cursor = __conn.execute('''SELECT sender,receiver,message,timestamp FROM messaggi WHERE sender=? OR receiver=? ORDER BY timestamp DESC LIMIT ?;''',(name,name,number))
+    else:
+        cursor = __conn.execute('''SELECT sender,receiver,message,timestamp FROM messaggi WHERE (sender=? AND receiver=?) OR (sender=? AND receiver=?) ORDER BY timestamp DESC LIMIT ?''',(name,specific,specific,name,number))
     data = []
     for row in cursor:
         data.append(row)
