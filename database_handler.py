@@ -135,9 +135,9 @@ def retrieve_chat(name, specific=None, number=100):
 def ban_user(user, admin=None, message="Sei stato bannato da questo servizio."):
     try:
         if admin==None:
-            __conn.execute('''INSERT INTO ban (user, message) VALUES (?,?);''', (user, message))
+            __conn.execute('''INSERT INTO ban (user, reason) VALUES (?,?);''', (user, message))
         else:
-            __conn.execute('''INSERT INTO ban (user, admin, message) VALUES (?,?,?);''', (user, admin, message))
+            __conn.execute('''INSERT INTO ban (user, admin, reason) VALUES (?,?,?);''', (user, admin, message))
         __conn.commit()
     except Error as e:
         print(e)
@@ -159,7 +159,7 @@ def save_messages(data):
 #   ATTENZIONE, QUESTA OPERAZIONE NON E' REVERSIBILE!
 def delete_user(name):
     try:
-        __conn.execute('''DELETE FROM utenti WHERE username=? LIMIT 1;''', (name,))
+        __conn.execute('''DELETE FROM utenti WHERE username=?;''', (name,))
         __conn.commit()
     except Error as e:
         print(e)
@@ -168,7 +168,7 @@ def delete_user(name):
 #   Rimuove un utente dalla lista ban.
 def unban_user(name):
     try:
-        __conn.execute('''DELETE FROM ban WHERE user=? LIMIT 1;''', (name,))
+        __conn.execute('''DELETE FROM ban WHERE user=?;''', (name,))
         __conn.commit()
     except Error as e:
         print(e)
@@ -177,7 +177,7 @@ def unban_user(name):
 #   Imposta il valore admin a un utente. Può rimuovere o aggiungere admin (valori 0 o 1).
 def set_admin(name, value):
     try:
-        __conn.execute('''UPDATE utenti SET isAdmin=? WHERE username=? LIMIT 1 ON CONFLICT DO NOTHING;''', (value,name))
+        __conn.execute('''UPDATE utenti SET isAdmin=? WHERE username=?;''', (value,name))
         __conn.commit()
     except Error as e:
         print(e)
@@ -208,7 +208,7 @@ def get_last_interactions(name):
 #   Formato data: [mail, nome, password]
 def edit_user(name, data):
     try:
-        __conn.execute('''UPDATE utenti SET mail=?, name=?, password=? WHERE username=? LIMIT 1''', (*data, name))
+        __conn.execute('''UPDATE utenti SET mail=?, name=?, password=? WHERE username=?;''', (*data, name))
         __conn.commit()
     except Error as e:
         print(e)
