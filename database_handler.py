@@ -13,7 +13,7 @@ __conn = None
 
 
 # Se la connessione esiste, salva i cambiamenti e la chiude, poi imposta la variabile __conn a None.
-def close_connection():
+def close_connection() -> None:
     global __conn
     try:
         if __conn != None:
@@ -25,7 +25,7 @@ def close_connection():
 
 
 #  Crea una connessione col database (chiude e riapre se esiste già).
-def create_connection():
+def create_connection() -> None:
     global __conn
     close_connection()
     __conn = None
@@ -36,14 +36,14 @@ def create_connection():
         
         
 #   Salva i cambiamenti al database, se esiste la connessione.
-def save_changes():
+def save_changes() -> None:
     global __conn
     if __conn != None:
         __conn.commit()
         
 
 #   Inizializza il database (se non esiste).
-def initialize_database():
+def initialize_database() -> None:
     try:
         __conn.execute('''CREATE TABLE IF NOT EXISTS utenti (
             "USERNAME" VARCHAR(50) PRIMARY KEY,
@@ -78,7 +78,7 @@ def initialize_database():
 
 #   Inserisce un utente/admin nel database. Nel caso un utente con lo stesso nome esista già il comando verrà ignorato.
 #   Formato: [utente, mail, nome, password]
-def insert_user(data, isAdmin=False):
+def insert_user(data : list, isAdmin : bool = False) -> None:
     try:
         __conn.execute('''INSERT INTO utenti (USERNAME, MAIL, NAME, PASSWORD, ISADMIN) VALUES (?,?,?,?,?) ON CONFLICT DO NOTHING;''', (*data,isAdmin))
         __conn.commit()
@@ -87,7 +87,7 @@ def insert_user(data, isAdmin=False):
     
     
 #   Recupera i dati di un utente tramite lo username, None se non esiste.
-def retrieve_user(name):
+def retrieve_user(name : str) -> list[tuple]:
     cursor = __conn.execute('''SELECT username,mail,name,password,isAdmin FROM utenti WHERE username=? LIMIT 1;''', (name,))
     data = None
     for row in cursor:
@@ -96,7 +96,7 @@ def retrieve_user(name):
 
 #   Restituisce tutti gli utenti con le loro informazioni e il loro ban status.
 #   ATTENZIONE, COMPUTAZIONALMENTE PESANTE, DA USARE SOLO SE NECESSARIO!!!
-def retrieve_all_users_and_ban_statuses(limit=500):
+def retrieve_all_users_and_ban_statuses(limit : int = 500) -> list[tuple]:
     cursor = __conn.execute('''SELECT username,mail,name,password,isAdmin FROM utenti LIMIT ?;''', (limit,))
     data = []
     for row in cursor:
@@ -109,7 +109,7 @@ def retrieve_all_users_and_ban_statuses(limit=500):
 #   Salva un messaggio nel database. Data è un array di stringhe contenenti rispettivamente chi lo ha inviato, chi lo ha ricevuto e il messaggio.
 #   Formato: [sender, receiver, message]
 #   ATTENZIONE, GLI UTENTI DEVONO ESISTERE NEL DATABASE!
-def save_message(data):
+def save_message(data : list) -> None:
     try:
         __conn.execute('''INSERT INTO messaggi (SENDER, RECEIVER, MESSAGE) VALUES (?,?,?);''', (*data,))
         __conn.commit()
@@ -119,7 +119,7 @@ def save_message(data):
     
 #   Recupera gli ultimi number (default 100) messaggi della chat dal database (sia ricevuta che inviata), ordinata in base al timestamp (dalla più recente alla più vecchia).
 #   Formato: [sender, receiver, message, timestamp]
-def retrieve_chat(name, specific=None, number=100):
+def retrieve_chat(name : str, specific : str = None, number : int = 100) -> list[tuple]:
     cursor = None
     if specific==None:
         cursor = __conn.execute('''SELECT sender,receiver,message,timestamp FROM messaggi WHERE sender=? OR receiver=? ORDER BY timestamp DESC LIMIT ?;''',(name,name,number))
@@ -132,7 +132,7 @@ def retrieve_chat(name, specific=None, number=100):
 
 
 #   Inserisce un utente all'interno della ban list nel database.
-def ban_user(user, admin=None, message="Sei stato bannato da questo servizio."):
+def ban_user(user:str, admin:str=None, message:str="Sei stato bannato da questo servizio.") -> None:
     try:
         if admin==None:
             __conn.execute('''INSERT INTO ban (user, reason) VALUES (?,?);''', (user, message))
@@ -146,7 +146,7 @@ def ban_user(user, admin=None, message="Sei stato bannato da questo servizio."):
 #   Salva messaggi multipli nel database. Data è un array di stringhe contenenti rispettivamente chi lo ha inviato, chi lo ha ricevuto e il messaggio.
 #   Formato: [(sender, receiver, message),...]
 #   ATTENZIONE, GLI UTENTI DEVONO ESISTERE NEL DATABASE! I MESSAGGI VERRANNO SALVATI CON LO STESSO TIMESTAMP!
-def save_messages(data):
+def save_messages(data:list) -> None:
     try:
         c = __conn.cursor()
         c.executemany('''INSERT INTO messaggi (sender, receiver, message) VALUES (?,?,?);''', data)
@@ -157,7 +157,7 @@ def save_messages(data):
         
 #   Elimina un utente all'interno del database.
 #   ATTENZIONE, QUESTA OPERAZIONE NON E' REVERSIBILE!
-def delete_user(name):
+def delete_user(name:str) -> None:
     try:
         __conn.execute('''DELETE FROM utenti WHERE username=?;''', (name,))
         __conn.commit()
@@ -166,7 +166,7 @@ def delete_user(name):
         
         
 #   Rimuove un utente dalla lista ban.
-def unban_user(name):
+def unban_user(name:str) -> None:
     try:
         __conn.execute('''DELETE FROM ban WHERE user=?;''', (name,))
         __conn.commit()
@@ -175,7 +175,7 @@ def unban_user(name):
         
         
 #   Imposta il valore admin a un utente. Può rimuovere o aggiungere admin (valori 0 o 1).
-def set_admin(name, value):
+def set_admin(name:str, value:int) -> None:
     try:
         __conn.execute('''UPDATE utenti SET isAdmin=? WHERE username=?;''', (value,name))
         __conn.commit()
@@ -184,7 +184,7 @@ def set_admin(name, value):
         
         
 #   Restituisce 1 se il nome è quello di un admin, 0 se non lo è, None se l'utente non è stato trovato.
-def is_admin(name):
+def is_admin(name:str) -> int:
     out = __conn.execute('''SELECT isAdmin FROM utenti WHERE username=? LIMIT 1;''', (name,))
     data = None
     for row in out:
@@ -193,7 +193,7 @@ def is_admin(name):
 
 
 #   Restituisce il momento dell'ultima interazione fatta da un utente con tutti gli altri utenti.
-def get_last_interactions(name):
+def get_last_interactions(name:str) -> list[tuple]:
     out = __conn.execute('''SELECT receiver, max(timestamp) AS timestamp FROM (SELECT receiver,timestamp FROM (SELECT receiver,timestamp,row_number() OVER(PARTITION BY receiver ORDER BY timestamp DESC) AS rn FROM messaggi WHERE sender=?) t1 WHERE t1.rn=1
                             UNION
                             SELECT sender as receiver,timestamp FROM (SELECT sender,timestamp,row_number() OVER(PARTITION BY receiver ORDER BY timestamp DESC) AS rn FROM messaggi WHERE receiver=?) t2 WHERE t2.rn=1)
@@ -206,7 +206,7 @@ def get_last_interactions(name):
 
 #   Modifica i dati di un utente all'interno del database.
 #   Formato data: [mail, nome, password]
-def edit_user(name, data):
+def edit_user(name:str, data:list) -> None:
     try:
         __conn.execute('''UPDATE utenti SET mail=?, name=?, password=? WHERE username=?;''', (*data, name))
         __conn.commit()
@@ -214,8 +214,8 @@ def edit_user(name, data):
         print(e)
 
 
-#   Controlla se un utente è bannato e ritorna una ragione.
-def is_banned(name):
+#   Controlla se un utente è bannato e ritorna la motivazione se lo è.
+def is_banned(name:str) -> tuple:
     out = __conn.execute('''SELECT reason FROM ban WHERE user=? LIMIT 1;''', (name,))
     data = (False, "")
     for row in out:
@@ -224,7 +224,7 @@ def is_banned(name):
 
 
 
-def initialize_session_state():
+def initialize_session_state() -> None:
     from streamlit import session_state
     from custom_functions import convert_to_dictionary
     if "dbcredentials" not in session_state:

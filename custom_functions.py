@@ -76,12 +76,3 @@ def convert_to_dictionary(data: list, labels=["usernames","email","name","passwo
     out[labels[0]] = temp
     return out
 
-
-def update_session_state(seconds=60):
-    from time import sleep
-    from database_handler import retrieve_all_users_and_ban_statuses
-    from streamlit import session_state
-    session_state["dbcredentials"] = convert_to_dictionary(retrieve_all_users_and_ban_statuses())
-    sleep(seconds)
-    update_session_state(seconds=seconds)
-    

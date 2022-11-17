@@ -2,45 +2,6 @@ cookie:
   expiry_days: 30
   key: some_signature_key
   name: session_cookie
-credentials:
-  usernames:
-    '1234':
-      admin: true
-      banned: false
-      email: '1234'
-      name: '1234'
-      password: $2b$12$NUNa.67YQdya.MIduX/cq.Exj8o59nsXQvVzsZ7X5N4aBOYT7lYla
-    alessandro:
-      email: alessandro@units.com
-      name: Alessandro Gregori
-      password: $2b$12$R8dR2NHkOZIZ61Fkb.uvP.P4bv4c80SYe3mEN7BRaokXfJQmGbo5.
-    asd:
-      admin: true
-      email: asd
-      name: asd
-      password: $2b$12$dHi5h/RHal0TnK1ZiHgXreerxh01B3m2vSBFl5ZiyJ4JmbLMqaZN2
-    bizz:
-      admin: false
-      banned: false
-      email: baa@foo.bar
-      name: Alex2 Bebeng
-      password: $2b$12$hyyt4K8sxpegMAtXRQitKO6hDZmE1eSXA/sdCAoAdHn8bcgQ9RNGa
-    ciao:
-      email: ciao
-      name: ciao
-      password: $2b$12$QaZETOSP8fHxiO63cxAKTehWTiOvxCdm4r.N98VWBn4GOJuvi3d9i
-    joel:
-      email: Joel
-      name: Joel
-      password: $2b$12$a.anduF9S1M0JsZ9k7USJOtZFd4oE5V/Z0Esmmo.5fowSl9V30v5W
-    luigi:
-      email: Luigi
-      name: Luigi
-      password: $2b$12$0J/uklRLobAx37l4ZY3/K.QtK9uoFAGzEJgB.1AQpHCtgPDuQfBsa
-    marco:
-      email: giacomo@units.com
-      name: Marco Rossi
-      password: $2b$12$Q1KDMlTuu3VLeqqXQtEOW.NfcuvtQSXXOq9cg.IhHvQzbq0aw5YfK
 preauthorized:
   emails:
   - test@test.test
