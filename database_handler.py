@@ -5,6 +5,7 @@ Created on Mon Nov 14 21:09:27 2022
 @author: Michele
 """
 
+from streamlit import session_state
 import sqlite3
 from sqlite3 import Error
 
@@ -50,7 +51,7 @@ def initialize_database():
             "MAIL" VARCHAR(75) UNIQUE NOT NULL,
             "NAME" VARCHAR(50) NOT NULL,
             "PASSWORD" VARCHAR(255) NOT NULL,
-            "ISADMIN" BOOLEAN NOT NULL
+            "ISADMIN" BOOLEAN NOT NULL DEFAULT 0
             );''')
         __conn.execute('''CREATE TABLE IF NOT EXISTS messaggi (
             "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -135,7 +136,7 @@ def ban_user(user, admin=None, message="Sei stato bannato da questo servizio."):
 def save_messages(data):
     try:
         c = __conn.cursor()
-        c.executemany('''INSERT INTO messaggi (SENDER, RECEIVER, MESSAGE) VALUES (?,?,?);''', data)
+        c.executemany('''INSERT INTO messaggi (sender, receiver, message) VALUES (?,?,?);''', data)
         __conn.commit()
     except Error as e:
         print(e)
@@ -145,7 +146,7 @@ def save_messages(data):
 #   ATTENZIONE, QUESTA OPERAZIONE NON E' REVERSIBILE!
 def delete_user(name):
     try:
-        __conn.execute('''DELETE FROM utenti WHERE USERNAME=? LIMIT 1;''', name)
+        __conn.execute('''DELETE FROM utenti WHERE username=? LIMIT 1;''', name)
         __conn.commit()
     except Error as e:
         print(e)
@@ -154,7 +155,7 @@ def delete_user(name):
 #   Rimuove un utente dalla lista ban.
 def unban_user(name):
     try:
-        __conn.execute('''DELETE FROM ban WHERE USER=? LIMIT 1;''', name)
+        __conn.execute('''DELETE FROM ban WHERE user=? LIMIT 1;''', name)
         __conn.commit()
     except Error as e:
         print(e)
@@ -163,13 +164,13 @@ def unban_user(name):
 #   Imposta il valore admin a un utente. Può rimuovere o aggiungere admin (valori 0 o 1).
 def set_admin(name, value):
     try:
-        __conn.execute('''UPDATE utenti SET isAdmin=? WHERE USERNAME=? LIMIT 1;''', (value,name))
+        __conn.execute('''UPDATE utenti SET isAdmin=? WHERE username=? LIMIT 1;''', (value,name))
         __conn.commit()
     except Error as e:
         print(e)
         
         
-#   Restituisce 1 se il nome è quello di un admin, 0 altrimenti.
+#   Restituisce 1 se il nome è quello di un admin, 0 se non lo è, None se l'utente non è stato trovato.
 def is_admin(name):
     out = __conn.execute('''SELECT isAdmin FROM utenti WHERE username=? LIMIT 1;''', name)
     data = None

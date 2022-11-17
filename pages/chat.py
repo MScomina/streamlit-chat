@@ -1,11 +1,10 @@
 import streamlit as st
 import streamlit_authenticator as stauth
-import csv
 import yaml
 from pathlib import Path
-from datetime import datetime
 import custom_functions as cf
 from PIL import Image
+import database_handler as dh
 
 
 im = Image.open("logo.png")
@@ -52,8 +51,6 @@ elif st.session_state["authentication_status"] and not cf.isBanned(config, st.se
             if message == "":
                 st.error("Can't send empty messages!")      # In caso si cercasse di inviare un messaggio vuoto
             else:
-                with open("chat.csv","a", newline="") as csvfile:       # Scrittura csv
-                    writer = csv.writer(csvfile)
-                    writer.writerow([datetime.today().strftime('%Y-%m-%d %H:%M:%S'), mittente, destinatario, message])
+                dh.save_message([mittente, destinatario, message])
                 
     cf.displayChat(mittente, destinatario) #Chat tra utenti
