@@ -5,7 +5,6 @@ Created on Mon Nov 14 21:09:27 2022
 @author: Michele
 """
 
-from streamlit import session_state
 import sqlite3
 from sqlite3 import Error
 
@@ -51,20 +50,20 @@ def initialize_database():
             "MAIL" VARCHAR(75) UNIQUE NOT NULL,
             "NAME" VARCHAR(50) NOT NULL,
             "PASSWORD" VARCHAR(255) NOT NULL,
-            "ISADMIN" BOOLEAN NOT NULL DEFAULT 0
+            "ISADMIN" INTEGER NOT NULL DEFAULT 0
             );''')
         __conn.execute('''CREATE TABLE IF NOT EXISTS messaggi (
             "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             "SENDER" VARCHAR(50) NOT NULL,
             "RECEIVER" VARCHAR(50) NOT NULL,
             "MESSAGE" VARCHAR(4096) NOT NULL,
-            "TIMESTAMP" INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            "TIMESTAMP" DATE NOT NULL DEFAULT (datetime('now','localtime')),
             FOREIGN KEY(SENDER) REFERENCES utente(USERNAME) ON DELETE CASCADE,
             FOREIGN KEY(RECEIVER) REFERENCES utente(USERNAME) ON DELETE CASCADE
             );''')
         __conn.execute('''CREATE TABLE IF NOT EXISTS ban (
             "USER" VARCHAR(50) PRIMARY KEY REFERENCES utente(USERNAME),
-            "ADMIN" VARCHAR(50) REFERENCES utente(USERNAME),
+            "ADMIN" VARCHAR(50) REFERENCES utente(USERNAME) ON DELETE SET NULL,
             "REASON" VARCHAR(512) DEFAULT "Sei stato bannato da questo servizio." NOT NULL
             );''')
         insert_user(["1234","1234","1234","$2b$12$NUNa.67YQdya.MIduX/cq.Exj8o59nsXQvVzsZ7X5N4aBOYT7lYla"])
@@ -124,7 +123,10 @@ def retrieve_chat(name, specific=None, number=100):
 #   Inserisce un utente all'interno della ban list nel database.
 def ban_user(user, admin=None, message="Sei stato bannato da questo servizio."):
     try:
-        __conn.execute('''INSERT INTO ban (user, admin, message) VALUES (?,?,?);''', (user, admin, message))
+        if admin==None:
+            __conn.execute('''INSERT INTO ban (user, message) VALUES (?,?);''', (user, message))
+        else:
+            __conn.execute('''INSERT INTO ban (user, admin, message) VALUES (?,?,?);''', (user, admin, message))
         __conn.commit()
     except Error as e:
         print(e)
@@ -146,7 +148,7 @@ def save_messages(data):
 #   ATTENZIONE, QUESTA OPERAZIONE NON E' REVERSIBILE!
 def delete_user(name):
     try:
-        __conn.execute('''DELETE FROM utenti WHERE username=? LIMIT 1;''', name)
+        __conn.execute('''DELETE FROM utenti WHERE username=? LIMIT 1;''', (name,))
         __conn.commit()
     except Error as e:
         print(e)
@@ -155,7 +157,7 @@ def delete_user(name):
 #   Rimuove un utente dalla lista ban.
 def unban_user(name):
     try:
-        __conn.execute('''DELETE FROM ban WHERE user=? LIMIT 1;''', name)
+        __conn.execute('''DELETE FROM ban WHERE user=? LIMIT 1;''', (name,))
         __conn.commit()
     except Error as e:
         print(e)
@@ -164,7 +166,7 @@ def unban_user(name):
 #   Imposta il valore admin a un utente. Può rimuovere o aggiungere admin (valori 0 o 1).
 def set_admin(name, value):
     try:
-        __conn.execute('''UPDATE utenti SET isAdmin=? WHERE username=? LIMIT 1;''', (value,name))
+        __conn.execute('''UPDATE utenti SET isAdmin=? WHERE username=? LIMIT 1 ON CONFLICT DO NOTHING;''', (value,name))
         __conn.commit()
     except Error as e:
         print(e)
@@ -172,7 +174,7 @@ def set_admin(name, value):
         
 #   Restituisce 1 se il nome è quello di un admin, 0 se non lo è, None se l'utente non è stato trovato.
 def is_admin(name):
-    out = __conn.execute('''SELECT isAdmin FROM utenti WHERE username=? LIMIT 1;''', name)
+    out = __conn.execute('''SELECT isAdmin FROM utenti WHERE username=? LIMIT 1;''', (name,))
     data = None
     for row in out:
         data = row[0]
@@ -203,7 +205,7 @@ def edit_user(name, data):
 
 #   Controlla se un utente è bannato e ritorna una ragione.
 def is_banned(name):
-    out = __conn.execute('''SELECT reason FROM ban WHERE user=? LIMIT 1;''', name)
+    out = __conn.execute('''SELECT reason FROM ban WHERE user=? LIMIT 1;''', (name,))
     data = (False, "")
     for row in out:
         data = (True, row[0])
