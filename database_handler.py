@@ -7,9 +7,6 @@ Created on Mon Nov 14 21:09:27 2022
 
 import sqlite3
 from sqlite3 import Error
-from time import time
-
-
 
 
 __conn = None
@@ -99,9 +96,9 @@ def retrieve_user(name):
 #   Salva un messaggio nel database. Data è un array di stringhe contenenti rispettivamente chi lo ha inviato, chi lo ha ricevuto e il messaggio.
 #   Formato: [sender, receiver, message]
 #   ATTENZIONE, GLI UTENTI DEVONO ESISTERE NEL DATABASE!
-def save_message(data, timestamp=int(time())):
+def save_message(data):
     try:
-        __conn.execute('''INSERT INTO messaggi (SENDER, RECEIVER, MESSAGE, TIMESTAMP) VALUES (?,?,?,?);''', (*data,timestamp))
+        __conn.execute('''INSERT INTO messaggi (SENDER, RECEIVER, MESSAGE) VALUES (?,?,?);''', (*data,))
         __conn.commit()
     except Error as e:
         print(e)
@@ -164,3 +161,22 @@ def set_admin(name, value):
     except Error as e:
         print(e)
         
+# Restituisce 1 se il nome è quello di un admin, 0 altrimenti.
+def is_admin(name):
+    out = __conn.execute('''SELECT isAdmin FROM utenti WHERE username=? LIMIT 1;''', name)
+    data = None
+    for row in out:
+        data = row[0]
+    return data
+
+
+# Restituisce il momento dell'ultima interazione fatta da un utente con tutti gli altri utenti.
+def get_last_interactions(name):
+    out = __conn.execute('''SELECT receiver, max(timestamp) AS timestamp FROM (SELECT receiver,timestamp FROM (SELECT receiver,timestamp,row_number() OVER(PARTITION BY receiver ORDER BY timestamp DESC) AS rn FROM messaggi WHERE sender=?) t1 WHERE t1.rn=1
+                            UNION
+                            SELECT sender as receiver,timestamp FROM (SELECT sender,timestamp,row_number() OVER(PARTITION BY receiver ORDER BY timestamp DESC) AS rn FROM messaggi WHERE receiver=?) t2 WHERE t2.rn=1)
+                            GROUP BY receiver ORDER BY timestamp DESC''', (name,name))
+    data = []
+    for row in out:
+        data.append(row)
+    return data
