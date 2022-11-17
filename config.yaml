@@ -5,7 +5,7 @@ cookie:
 credentials:
   usernames:
     '1234':
-      admin: false
+      admin: true
       banned: false
       email: '1234'
       name: '1234'
@@ -15,6 +15,7 @@ credentials:
       name: Alessandro Gregori
       password: $2b$12$R8dR2NHkOZIZ61Fkb.uvP.P4bv4c80SYe3mEN7BRaokXfJQmGbo5.
     asd:
+      admin: true
       email: asd
       name: asd
       password: $2b$12$dHi5h/RHal0TnK1ZiHgXreerxh01B3m2vSBFl5ZiyJ4JmbLMqaZN2

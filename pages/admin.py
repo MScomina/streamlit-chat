@@ -8,8 +8,7 @@ import streamlit as st
 import pandas as pd
 import yaml
 from pathlib import Path
-
-import streamlit as st
+import database_handler as db
 import streamlit_authenticator as stauth
 import custom_functions as cf
 
@@ -26,16 +25,15 @@ authenticator = stauth.Authenticate(
     config['cookie']['expiry_days'],
     config['preauthorized']
 )
-
 if st.session_state["authentication_status"] == False:
     st.error('Username/password is incorrect')
     cf.switch_page('app')
 elif st.session_state["authentication_status"] == None:
     st.warning('You are not logged in.')
     cf.switch_page('app')
-elif st.session_state["authentication_status"] and not cf.isAdmin(config, st.session_state["username"]):
+elif st.session_state["authentication_status"] and db.is_admin(st.session_state["username"])==0:
     st.warning('You do not have the authorization')
-elif st.session_state["authentication_status"] and cf.isAdmin(config, st.session_state["username"]):  
+elif st.session_state["authentication_status"] and db.is_admin(st.session_state["username"])==1:  
     authenticator.logout('Logout', 'main')
     
     
@@ -70,16 +68,12 @@ elif st.session_state["authentication_status"] and cf.isAdmin(config, st.session
             with col1:
                 if st.button('Banna utente'):
                     st.write(utenteBan, 'bannato')
-                    config['credentials']['usernames'][utenteBan].update(banned=True)
-                    with file_path.open('w') as file:
-                        yaml.dump(config, file, default_flow_style=False)
+                    db.ban_user(utenteBan)
                     
             with col2:
                 if st.button('Sbanna utente'):
                     st.write(utenteBan, 'sbannato')
-                    config['credentials']['usernames'][utenteBan].update(banned=False)
-                    with file_path.open('w') as file:
-                        yaml.dump(config, file, default_flow_style=False)
+                    db.unban_user(utenteBan)
     
     #Creazione Admin
     with admin:
@@ -88,12 +82,12 @@ elif st.session_state["authentication_status"] and cf.isAdmin(config, st.session
         with colA:
             if st.button('Rendi utente un admin'):
                 st.write(utenteAdmin, 'è ora un admin')
-                config['credentials']['usernames'][utenteAdmin].update(admin=True)
-                with file_path.open('w') as file:
-                    yaml.dump(config, file, default_flow_style=False)
+                db.set_admin(utenteAdmin,1)
+                st.write(db.is_admin(utenteAdmin))
+                
         with colB:        
             if st.button('Togli a utente privilegi admin'):
                 st.write(utenteAdmin, 'non è più un admin')
-                config['credentials']['usernames'][utenteAdmin].update(admin=False)
-                with file_path.open('w') as file:
-                    yaml.dump(config, file, default_flow_style=False)
+                db.set_admin(utenteAdmin,0)
+                st.write(db.is_admin(utenteAdmin))
+        
