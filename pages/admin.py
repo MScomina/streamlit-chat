@@ -52,13 +52,13 @@ elif st.session_state["authentication_status"] and db.is_admin(st.session_state[
         utente1 = st.selectbox("Utente1", options = utenti.keys())
         utente2 = st.selectbox("Utente2", options = utenti.keys())
         if st.button('Mostra chat'): #Mostra i messaggi inviati tra i due utenti scelti, se ce ne sono
-            tempData = convos[((convos['Mittente'] == utente1) | (convos['Mittente'] ==utente2)) & ((convos['Destinatario'] == utente1) | (convos['Destinatario'] ==utente2)) ]
+            tempData = db.retrieve_chat(utente1,specific=utente2)
             st.dataframe(tempData)   
     #Controlla messaggi singolo utente
     with msgutenti:
                 utente = st.selectbox("Utente", options = utenti.keys())
                 if st.button('Mostra messaggi'):
-                    messaggi= convos[convos['Mittente']==utente]
+                    messaggi= db.retrieve_chat(utente)
                     st.dataframe(messaggi)
                     
     #Ban o Unban
